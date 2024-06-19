@@ -71,8 +71,9 @@ class game_menu():
             case "D":
                 print("Deleting Profile")
             case "X":
-                print("Exiting Game")
-                sleep(.25)
+                print(" Exiting Game...")
+                sleep(1)
+                system("cls")
                 exit()
     
 class player_guess():
