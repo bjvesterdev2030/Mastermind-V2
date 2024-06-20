@@ -253,15 +253,73 @@ class game_board():
     def __init__(self, active_player:dict):
         self.active_player = active_player
         self.code = code().generate_code()
+        self.guess_rows = ["● ● ● ●" for _ in range(10)]
+        self.hint_rows = ["○ ○ ○ ○" for _ in range(len(self.guess_rows))]
+        self.guess_options = {
+            "1":style_text("●", "f91b40"),
+            "2":style_text("●", "f92b40"),
+            "3":style_text("●", "f93b40"),
+            "4":style_text("●", "f94b40"),
+            "5":style_text("●", "f95b40"),
+            "6":style_text("●", "f96b40")
+        }
         
+        self.turn_number = 0
+        self.score = 0
+        self.code_matching = False
+    
+    # --- The Play Function --- #
+    
     def play(self):
-        print(self.code)
+        self.display_game_board()
+        
+        while self.code_matching != True:
+            for _ in range(len(self.guess_rows)):
+                player_guess = self.get_player_guess()
+                self.evaluate_guess(player_guess)
+                self.modify_score()
+                self.increment_turn_number()
+                
+        
+    # --- Game Operation Functions --- #
+    
+    def display_game_board(self):
+        print()
+        if self.active_player != None:
+            print(f" Active Player : {self.active_player['player_name']}")
+        else:
+            print(" Active Player : Guest")
+            
+        print(f" Score : {self.score}")
+        print(f" Turn Number : {self.turn_number}")
+        
+        line_break = " _________________\n"
+        print(line_break)
+        
+        for row in self.guess_rows:
+            row_index = self.guess_rows.index(row)
+            print(f" {self.guess_rows[row_index]} | {self.hint_rows[row_index]}")
+            
+        print(line_break)
+        
+    def get_player_guess(self):
+        pass
+    
+    def evaluate_guess(self, player_guess):
+        pass
+    
+    def modify_score(self):
+        pass
+    
+    def increment_turn_number(self):
+        pass
+    
         
 def main():
     # menu = game_menu()
     # menu.display_menu_screen()
     
-    game = game_board(active_player={None})
+    game = game_board(None)
     game.play()
 
 if __name__ == "__main__":
