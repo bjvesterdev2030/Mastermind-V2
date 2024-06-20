@@ -92,7 +92,13 @@ class game_menu():
                 print(" Starting Game...")
                 sleep(1)
                 game = game_board(active_player=self.active_profile)
-                game.play()
+                score = game.play()
+                
+                if score != None:
+                    # TODO: Need to figure out how the score is gonna change.
+                    pass
+                
+                self.return_to_menu()
             case "H":
                 print(" Showing High Scores...")
                 sleep(1)
@@ -227,9 +233,32 @@ class game_menu():
         
         self.return_to_menu()
         
-class player_guess():
-    def __init__(self):
-        pass
+class guess():
+    def __init__(self, guess_options):
+        self.guess_options = guess_options
+        self.player_guess = self.new_player_guess()
+        
+    def new_player_guess(self):
+        guess_pattern = ''
+        
+        print(" Press [X] to return to the menu")
+        player_guess_validity = False
+        while player_guess_validity == False:
+            player_guess = str(input(" Enter your guess : "))
+            
+            if player_guess == 'X':
+                player_guess_validity == True
+                return 'X'
+                
+            if len(player_guess) != 4:
+                print(" Player guess is improper length")
+                player_guess_validity = False
+                continue
+            
+            
+            print("yoyo")
+            # for guess_part in player_guess:
+                
 
 # NOTE: For the time being, the code must consist of four separate colors. Might change this later idk. Maybe this could be a difficulty setting?
 class code():
@@ -255,16 +284,14 @@ class game_board():
         self.code = code().generate_code()
         self.guess_rows = ["● ● ● ●" for _ in range(10)]
         self.hint_rows = ["○ ○ ○ ○" for _ in range(len(self.guess_rows))]
-        self.guess_options = {
-            "1":style_text("●", "f91b40"),
-            "2":style_text("●", "f92b40"),
-            "3":style_text("●", "f93b40"),
-            "4":style_text("●", "f94b40"),
-            "5":style_text("●", "f95b40"),
-            "6":style_text("●", "f96b40")
-        }
-        
-        self.turn_number = 0
+        self.guess_options = [
+            style_text("●", "f91b40"),
+            style_text("●", "f92b40"),
+            style_text("●", "f93b40"),
+            style_text("●", "f94b40"),
+            style_text("●", "f95b40"),
+            style_text("●", "f96b40")]
+        self.turn_number = 1
         self.score = 0
         self.code_matching = False
     
@@ -275,15 +302,21 @@ class game_board():
         
         while self.code_matching != True:
             for _ in range(len(self.guess_rows)):
+                if self.turn_number != 10:
+                    self.increment_turn_number()
                 player_guess = self.get_player_guess()
-                self.evaluate_guess(player_guess)
-                self.modify_score()
-                self.increment_turn_number()
                 
+                if player_guess == 'X':
+                    return
+                else:
+                    self.evaluate_guess(player_guess)
+                    self.modify_score()
+                    self.display_game_board()
         
     # --- Game Operation Functions --- #
     
     def display_game_board(self):
+        system("cls")
         print()
         if self.active_player != None:
             print(f" Active Player : {self.active_player['player_name']}")
@@ -296,6 +329,15 @@ class game_board():
         line_break = " _________________\n"
         print(line_break)
         
+        guess_option_bar = ''
+        for option in self.guess_options:
+            guess_option_bar += f" {self.guess_options.index(option)+1} [{option}]"
+            if self.guess_options.index(option) == 2:
+                guess_option_bar += "\n"
+        
+        print(guess_option_bar)
+        print(line_break)
+        
         for row in self.guess_rows:
             row_index = self.guess_rows.index(row)
             print(f" {self.guess_rows[row_index]} | {self.hint_rows[row_index]}")
@@ -303,7 +345,8 @@ class game_board():
         print(line_break)
         
     def get_player_guess(self):
-        pass
+        current_player_guess = guess(self.guess_options).player_guess    
+        return current_player_guess
     
     def evaluate_guess(self, player_guess):
         pass
@@ -316,11 +359,11 @@ class game_board():
     
         
 def main():
-    # menu = game_menu()
-    # menu.display_menu_screen()
+    menu = game_menu()
+    menu.display_menu_screen()
     
-    game = game_board(None)
-    game.play()
+    # game = game_board(None)
+    # game.play()
 
 if __name__ == "__main__":
     main()
