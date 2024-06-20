@@ -8,7 +8,7 @@ from os import system
 
 # Special Characters : ╚ ╗ ╔ ╝║ ═ ╣ ╠ ╩ ╦ ●
 
-
+# TODO: Fix the player profile class... should have included that to begin with... do this last. Maybe its not needed
 class player_profile():
     def __init__(self):
         pass
@@ -94,6 +94,7 @@ class game_menu():
             case "C":
                 print(" Creating New Profile...")
                 sleep(1)
+                self.create_new_profile()
             case "D":
                 print(" Deleting Profile...")
                 sleep(1)
@@ -143,9 +144,47 @@ class game_menu():
             print(f" {i+1}. {profile['player_name']} -- {profile['player_highscore']}")
             
         self.return_to_menu()
-        
-        
     
+    def create_new_profile(self):
+        system("cls")
+        print("\n <--> <--> Create Profile <--> <--> \n")
+        
+        valid_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0987654321-_. "
+        
+        player_name_validity = False
+        while player_name_validity == False:
+            player_name = str(input(" Enter player name : "))
+            
+            if len(player_name) < 3:
+                print(" Player name is too short. Player name should be longer than three characters.")
+                player_name_validity = False
+                continue
+            
+            for character in player_name:
+                if character not in valid_characters:
+                    print(" This input is invalid. Please enter a valid input.")
+                    player_name_validity = False
+                    continue
+                else:
+                    player_name_validity = True
+            
+        player_id = f"M-{len(self.player_profiles)+1}"
+        
+        new_player_profile = {
+            "player_id" : player_id,
+            "player_name" : player_name,
+            "player_highscore" : 0
+        }
+        
+        self.player_profiles.append(new_player_profile)
+        profile_file_update = json.dumps(self.player_profiles, indent=4)
+        
+        with open("player_profiles.json", "wt") as profiles_file:
+            profiles_file.write(profile_file_update)
+        profiles_file.close()
+            
+        self.return_to_menu()
+        
 class player_guess():
     def __init__(self):
         pass
