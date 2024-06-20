@@ -5,19 +5,24 @@
         "player_highscore" : 10
     },
     {
+        "player_id" : "M-06",
+        "player_name" : "Yury Johossefat",
+        "player_highscore" : 60
+    },
+    {
         "player_id" : "M-02",
         "player_name" : "Jane Doe",
         "player_highscore" : 20
     },
     {
-        "player_id" : "M-03",
-        "player_name" : "Jarod Smith",
-        "player_highscore" : 30
-    },
-    {
         "player_id" : "M-04",
         "player_name" : "Typhus Molly",
         "player_highscore" : 40
+    },
+    {
+        "player_id" : "M-03",
+        "player_name" : "Jarod Smith",
+        "player_highscore" : 30
     },
     {
         "player_id" : "M-05",

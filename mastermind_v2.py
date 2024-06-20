@@ -85,16 +85,17 @@ class game_menu():
                 sleep(1)
                 self.set_active_profile()
             case "G":
-                print("Starting Game...")
+                print(" Starting Game...")
                 sleep(1)
             case "H":
-                print("Showing High Scores...")
+                print(" Showing High Scores...")
                 sleep(1)
+                self.show_high_scores()
             case "C":
-                print("Creating New Profile...")
+                print(" Creating New Profile...")
                 sleep(1)
             case "D":
-                print("Deleting Profile...")
+                print(" Deleting Profile...")
                 sleep(1)
             case "X":
                 print(" Exiting Game...")
@@ -116,11 +117,11 @@ class game_menu():
             (print(f" [{i+1}] {profile['player_name']}"))
         print()
         
-        valid_input = [str(num) for num in range(1, len(self.player_profiles))]
+        valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
         
         profile_selection = 0
         while (profile_selection not in valid_input):
-            profile_selection = str(input("Selection : "))
+            profile_selection = str(input(" Selection : "))
             if profile_selection not in valid_input:
                 print(" This input is invalid. Please enter a valid input.")
         
@@ -131,7 +132,17 @@ class game_menu():
         
         self.return_to_menu()
         
-    
+    def show_high_scores(self):
+        system("cls")
+        print("\n <--> <--> Highscores <--> <--> \n")
+        
+        profile_by_high_score = sorted(self.player_profiles, key=lambda profile: profile["player_highscore"])
+        profile_by_high_score = reversed(profile_by_high_score[-5::])
+        
+        for i, profile in enumerate(profile_by_high_score):
+            print(f" {i+1}. {profile['player_name']} -- {profile['player_highscore']}")
+            
+        self.return_to_menu()
         
         
     
