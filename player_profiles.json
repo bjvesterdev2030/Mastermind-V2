@@ -33,10 +33,5 @@
         "player_id": "M-7",
         "player_name": "John Cena",
         "player_highscore": 0
-    },
-    {
-        "player_id": "M-8",
-        "player_name": "David",
-        "player_highscore": 0
     }
 ]

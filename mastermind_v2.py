@@ -8,6 +8,9 @@ from os import system
 
 # Special Characters : ╚ ╗ ╔ ╝║ ═ ╣ ╠ ╩ ╦ ●
 
+# BUG: Cannot escape the set_active_player() or delete_profile() functions if there are no profiles. Fix this.
+
+# TODO: Begin working on the game portion of this project. Except for the above bug, the menu is complete.  
 # TODO: Fix the player profile class... should have included that to begin with... do this last. Maybe its not needed
 class player_profile():
     def __init__(self):
@@ -98,6 +101,7 @@ class game_menu():
             case "D":
                 print(" Deleting Profile...")
                 sleep(1)
+                self.delete_profile()
             case "X":
                 print(" Exiting Game...")
                 sleep(1)
@@ -183,6 +187,41 @@ class game_menu():
             profiles_file.write(profile_file_update)
         profiles_file.close()
             
+        print(f"\n Created profile... {new_player_profile['player_name']}")
+        
+        self.return_to_menu()
+        
+    def delete_profile(self):
+        system("cls")
+        print("\n <--> <--> Delete Profile <--> <--> \n")
+        
+        for i, profile in enumerate(self.player_profiles):
+            (print(f" [{i+1}] {profile['player_name']}"))
+        print()
+        
+        valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
+        
+        profile_selection = 0
+        while (profile_selection not in valid_input):
+            profile_selection = str(input(" Selection : "))
+            if profile_selection not in valid_input:
+                print(" This input is invalid. Please enter a valid input.")
+                
+        profile_selection = int(profile_selection)-1
+        
+        print(f"\n Deleting profile... {self.player_profiles[profile_selection]['player_name']}")
+        
+        if (self.active_profile != None) and (self.active_profile["player_id"] == self.player_profiles[profile_selection]["player_id"]):
+            self.active_profile = None
+        
+        self.player_profiles.pop(profile_selection)
+        
+        profile_file_update = json.dumps(self.player_profiles, indent=4)
+        
+        with open("player_profiles.json", "wt") as profiles_file:
+            profiles_file.write(profile_file_update)
+        profiles_file.close()
+        
         self.return_to_menu()
         
 class player_guess():
