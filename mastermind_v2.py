@@ -18,7 +18,9 @@ class game_menu():
         self.logo = self.recall_logo()
         self.active_profile = None
         self.player_profiles = self.recall_profiles()
-        
+
+    # --- Methods for data recall --- #
+    
     def recall_profiles(self):
         with open("player_profiles.json", "rt") as profiles_file:
             profiles = json.load(profiles_file)
@@ -28,6 +30,8 @@ class game_menu():
         with open("logo.txt", 'rt') as file:
             logo = file.read()
             return logo
+        
+    # --- Menu operation functions --- #
         
     def display_menu_screen(self):
         system("cls")
@@ -63,8 +67,13 @@ class game_menu():
             
         print(line_break)
         
-        # TODO: Make sure this ish is valid
-        menu_selection = str(input(" Selection : "))
+        valid_input = [option["option_short"] for option in menu_options]
+        
+        menu_selection = ""
+        while menu_selection not in valid_input:
+            menu_selection = str(input(" Selection : "))
+            if menu_selection not in valid_input:
+                print(" This input is invalid. Please enter a valid input.")
         print(line_break)
         
         self.menu_selection_handler(menu_selection)
@@ -94,8 +103,10 @@ class game_menu():
                 exit()
                 
     def return_to_menu(self):
-        input(" \n Press Enter to return to menu...")
+        input(" \n Press any key to return to menu...")
         self.display_menu_screen()
+                
+    # --- Menu option functions --- #
                 
     def set_active_profile(self):
         system("cls")
@@ -103,8 +114,17 @@ class game_menu():
         
         for i, profile in enumerate(self.player_profiles):
             (print(f" [{i+1}] {profile['player_name']}"))
-            
-        profile_selection = int(input("\n Selection : ")) - 1
+        print()
+        
+        valid_input = [str(num) for num in range(1, len(self.player_profiles))]
+        
+        profile_selection = 0
+        while (profile_selection not in valid_input):
+            profile_selection = str(input("Selection : "))
+            if profile_selection not in valid_input:
+                print(" This input is invalid. Please enter a valid input.")
+        
+        profile_selection = int(profile_selection)-1
         self.active_profile = self.player_profiles[profile_selection]
         
         print(f"\n Active Profile set to... {self.active_profile['player_name']}")
