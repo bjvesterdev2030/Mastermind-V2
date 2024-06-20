@@ -239,7 +239,7 @@ class guess():
         self.player_guess = self.new_player_guess()
         
     def new_player_guess(self):
-        guess_pattern = ''
+        player_guess = ''
         
         print(" Press [X] to return to the menu")
         player_guess_validity = False
@@ -255,9 +255,15 @@ class guess():
                 player_guess_validity = False
                 continue
             
-            
-            print("yoyo")
-            # for guess_part in player_guess:
+            for guess_part in player_guess:
+                if guess_part not in [str(self.guess_options.index(option)) for option in self.guess_options]:
+                    print(" This guess is not valid")
+                    player_guess_validity = False
+                    break
+                else:
+                    player_guess_validity = True
+        
+        return player_guess
                 
 
 # NOTE: For the time being, the code must consist of four separate colors. Might change this later idk. Maybe this could be a difficulty setting?
@@ -300,18 +306,24 @@ class game_board():
     def play(self):
         self.display_game_board()
         
-        while self.code_matching != True:
-            for _ in range(len(self.guess_rows)):
-                if self.turn_number != 10:
-                    self.increment_turn_number()
-                player_guess = self.get_player_guess()
+        # NOTE: Future Dena. Im trying to make the ending screen stop on turn 10. If i use '<= 10', the end screen shows turn 11. If i use '< 10', the end screen shows total turns 10, but I only get 9 turns. Don't really know how to fix yet. I think it has something to doo with the while loop. - Past Dena
+        while (self.code_matching != True) and (self.turn_number <= 10):
+            if self.turn_number != 10:
+                self.increment_turn_number()
                 
-                if player_guess == 'X':
-                    return
-                else:
-                    self.evaluate_guess(player_guess)
-                    self.modify_score()
-                    self.display_game_board()
+            player_guess = self.get_player_guess()
+            
+            if player_guess == 'X':
+                return
+            else:
+                self.evaluate_guess(player_guess)
+                self.modify_score()
+                self.display_game_board()
+                
+        if self.code_matching != True:
+            print(f" Game Over. You Lost.\n Total Turns : {self.turn_number}")
+        elif self.code_matching == True:
+            print(f" Game Over. You Won.\n Total Turns : {self.turn_number}")
         
     # --- Game Operation Functions --- #
     
@@ -355,15 +367,15 @@ class game_board():
         pass
     
     def increment_turn_number(self):
-        pass
+        self.turn_number += 1
     
         
 def main():
-    menu = game_menu()
-    menu.display_menu_screen()
+    # menu = game_menu()
+    # menu.display_menu_screen()
     
-    # game = game_board(None)
-    # game.play()
+    game = game_board(None)
+    game.play()
 
 if __name__ == "__main__":
     main()
