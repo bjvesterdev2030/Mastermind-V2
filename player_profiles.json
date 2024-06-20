@@ -1,0 +1,27 @@
+[
+    {
+        "player_id" : "M-01",
+        "player_name" : "John Doe",
+        "player_highscore" : 10
+    },
+    {
+        "player_id" : "M-02",
+        "player_name" : "Jane Doe",
+        "player_highscore" : 20
+    },
+    {
+        "player_id" : "M-03",
+        "player_name" : "Jarod Smith",
+        "player_highscore" : 30
+    },
+    {
+        "player_id" : "M-04",
+        "player_name" : "Typhus Molly",
+        "player_highscore" : 40
+    },
+    {
+        "player_id" : "M-05",
+        "player_name" : "Edlina Johossefat",
+        "player_highscore" : 50
+    }
+]
