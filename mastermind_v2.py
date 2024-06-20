@@ -1,5 +1,6 @@
 import json
 import datetime as dt
+import random as rnd
 
 from pycolor import style_text
 from time import sleep
@@ -90,6 +91,8 @@ class game_menu():
             case "G":
                 print(" Starting Game...")
                 sleep(1)
+                game = game_board(active_player=self.active_profile)
+                game.play()
             case "H":
                 print(" Showing High Scores...")
                 sleep(1)
@@ -228,17 +231,38 @@ class player_guess():
     def __init__(self):
         pass
 
+# NOTE: For the time being, the code must consist of four separate colors. Might change this later idk. Maybe this could be a difficulty setting?
 class code():
     def __init__(self):
-        pass
-
-class game_board():
-    def __init__(self):
-        pass
+        self.code = self.generate_code()
     
+    def generate_code(self):
+        # TODO: Gonna make this stuff words... yeah.
+        available_colors = ["91","92","93","94","95","96"]
+        code_pattern = ''
+        
+        for _ in range(4):
+            color_index = rnd.randrange(len(available_colors))
+            chosen_color = available_colors[color_index]
+            code_pattern += style_text("●", f"f{chosen_color}b40")
+            available_colors.pop(color_index)
+        
+        return code_pattern    
+        
+class game_board():
+    def __init__(self, active_player:dict):
+        self.active_player = active_player
+        self.code = code().generate_code()
+        
+    def play(self):
+        print(self.code)
+        
 def main():
-    menu = game_menu()
-    menu.display_menu_screen()
+    # menu = game_menu()
+    # menu.display_menu_screen()
+    
+    game = game_board(active_player={None})
+    game.play()
 
 if __name__ == "__main__":
     main()
