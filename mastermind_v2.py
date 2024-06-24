@@ -242,31 +242,32 @@ class guess():
         player_guess = ''
         
         print(" Press [X] to return to the menu")
-        player_guess_validity = False
-        while player_guess_validity == False:
+        while True:
             player_guess = str(input(" Enter your guess : "))
             
             if player_guess == 'X':
-                player_guess_validity == True
                 return 'X'
                 
             if len(player_guess) != 4:
                 print(" Player guess is improper length")
-                player_guess_validity = False
                 continue
             
             for guess_part in player_guess:
+                # NOTE: I have no idea what the issue is here. Actually, its probobly an index issue. Regardless, for what ever reason, 0 is accessing the color the 6 should be accessing. Whatever. It works like this. 
+                # TODO: Fix this absolute baboon.
+                if guess_part == '6':
+                    guess_part = '0'
+                elif guess_part == '0':
+                    guess_part = '6'
+                
                 if guess_part not in [str(self.guess_options.index(option)) for option in self.guess_options]:
                     print(" This guess is not valid")
-                    player_guess_validity = False
                     break
                 else:
-                    player_guess_validity = True
-        
-        return player_guess
+                    return player_guess
                 
 
-# NOTE: For the time being, the code must consist of four separate colors. Might change this later idk. Maybe this could be a difficulty setting?
+# NOTE: For the time being, the code must consist of four unique colors. Might change this later idk. Maybe this could be a difficulty setting?
 class code():
     def __init__(self):
         self.code = self.generate_code()
@@ -279,7 +280,7 @@ class code():
         for _ in range(4):
             color_index = rnd.randrange(len(available_colors))
             chosen_color = available_colors[color_index]
-            code_pattern += style_text("●", f"f{chosen_color}b40")
+            code_pattern += (style_text("●", f"f{chosen_color}b40") + " ")
             available_colors.pop(color_index)
         
         return code_pattern    
@@ -288,7 +289,7 @@ class game_board():
     def __init__(self, active_player:dict):
         self.active_player = active_player
         self.code = code().generate_code()
-        self.guess_rows = ["● ● ● ●" for _ in range(10)]
+        self.guess_rows = ["● ● ● ● " for _ in range(10)]
         self.hint_rows = ["○ ○ ○ ○" for _ in range(len(self.guess_rows))]
         self.guess_options = [
             style_text("●", "f91b40"),
@@ -297,20 +298,19 @@ class game_board():
             style_text("●", "f94b40"),
             style_text("●", "f95b40"),
             style_text("●", "f96b40")]
-        self.turn_number = 1
+        self.turn_number = 0
         self.score = 0
         self.code_matching = False
+    
+    # NOTE: Concernig the use of 'self.turn_number' and 'self.increment_turn_number()' in the methods 'self.play(),' 'self.display_game_board(),' and 'self.evaluate_guess,' I have no idea how anything is currently set up. Some how I had to add 1 to the turn number to display the number, but also subtract 1 from the turn order to update the board values. In short, it is spaghettied. Tbh i dont really care. It works.
     
     # --- The Play Function --- #
     
     def play(self):
         self.display_game_board()
         
-        # NOTE: Future Dena. Im trying to make the ending screen stop on turn 10. If i use '<= 10', the end screen shows turn 11. If i use '< 10', the end screen shows total turns 10, but I only get 9 turns. Don't really know how to fix yet. I think it has something to doo with the while loop. - Past Dena
-        while (self.code_matching != True) and (self.turn_number <= 10):
-            if self.turn_number != 10:
-                self.increment_turn_number()
-                
+        while (self.code_matching == False) and (self.turn_number < len(self.guess_rows)):
+            self.increment_turn_number()
             player_guess = self.get_player_guess()
             
             if player_guess == 'X':
@@ -319,13 +319,16 @@ class game_board():
                 self.evaluate_guess(player_guess)
                 self.modify_score()
                 self.display_game_board()
+            
                 
-        if self.code_matching != True:
+        self.game_over_handler()
+        
+    # --- Game Operation Functions --- #
+    def game_over_handler(self):
+        if self.code_matching == False:
             print(f" Game Over. You Lost.\n Total Turns : {self.turn_number}")
         elif self.code_matching == True:
             print(f" Game Over. You Won.\n Total Turns : {self.turn_number}")
-        
-    # --- Game Operation Functions --- #
     
     def display_game_board(self):
         system("cls")
@@ -336,7 +339,10 @@ class game_board():
             print(" Active Player : Guest")
             
         print(f" Score : {self.score}")
-        print(f" Turn Number : {self.turn_number}")
+        if self.turn_number < 10:
+            print(f" Turn Number : {self.turn_number+1}")
+        else:
+            print(f" Turn Number : {self.turn_number}")
         
         line_break = " _________________\n"
         print(line_break)
@@ -352,7 +358,7 @@ class game_board():
         
         for row in self.guess_rows:
             row_index = self.guess_rows.index(row)
-            print(f" {self.guess_rows[row_index]} | {self.hint_rows[row_index]}")
+            print(f" {self.guess_rows[row_index]}| {self.hint_rows[row_index]}")
             
         print(line_break)
         
@@ -360,8 +366,33 @@ class game_board():
         current_player_guess = guess(self.guess_options).player_guess    
         return current_player_guess
     
-    def evaluate_guess(self, player_guess):
-        pass
+    def evaluate_guess(self, player_guess_indicators):
+        player_guess_color = ''
+        for num in player_guess_indicators:
+            player_guess_color += f"{self.guess_options[(int(num)-1)]} "
+        
+        hint = ''
+        
+        
+        
+        code = self.code.split(" ")[0:4]
+        guess = player_guess_color.split(" ")[0:4]
+        
+        # TODO: Finish working on this mess. Its wrong. Play with it.
+        for peg in guess:
+            peg_index = guess.index(peg)
+            if (peg in code) and (peg == code[peg_index]):
+                hint += (style_text("●", "f91b40") + " ")
+            elif (peg in code) and (peg != code[peg_index]):
+                hint += (style_text("●", "f97b40") + " ")
+            elif (peg not in code):
+                hint += "○ "
+        
+        
+        self.hint_rows[self.turn_number-1] = hint   
+        self.guess_rows[self.turn_number-1] = player_guess_color
+        print(self.code)
+        input()
     
     def modify_score(self):
         pass
