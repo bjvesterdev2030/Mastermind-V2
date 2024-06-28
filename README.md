@@ -5,6 +5,7 @@ Additionally, the game works with profile system to record player highscores.
 The profile data is stored in a JSON file.
 
 Rules:
+
     The aim of the game is to guess the hidden code.
 
     The code will be created from a set of six different colors. 
@@ -20,7 +21,9 @@ Rules:
     If the player wishes to return to the menu during a game, they can press 'X'.
 
 Menu Options:
+
     The game menu includes the following options:
+    
         1. Set Active Profile - This allows for the recording of game highscores. Without an active profile, the game will be run as a guest. No score will be recorded. 
         2. Start Game - Initiates the game... duh.
         3. Show High Scores - Shows the top five [5] high scores... again, pretty self explanitory.
