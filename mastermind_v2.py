@@ -10,9 +10,6 @@ from os import system
 # Special Characters : ╚ ╗ ╔ ╝║ ═ ╣ ╠ ╩ ╦ ●
 
 # BUG: Cannot escape the set_active_player() or delete_profile() functions if there are no profiles. Fix this.
-
-# TODO: Begin working on the game portion of this project. Except for the above bug, the menu is complete.  
-# TODO: Fix the player profile class... should have included that to begin with... do this last. Maybe its not needed
 class player_profile():
     def __init__(self):
         pass
@@ -236,38 +233,61 @@ class game_menu():
 class guess():
     def __init__(self, guess_options):
         self.guess_options = guess_options
-        self.player_guess = self.new_player_guess()
+        self.player_guess = self.new_player_guess_handler()
         
-    def new_player_guess(self):
+    def new_player_guess_handler(self):
         player_guess = ''
         
         print(" Press [X] to return to the menu")
+        
         while True:
             player_guess = str(input(" Enter your guess : "))
-            
-            if player_guess == 'X':
-                return 'X'
-                
-            if len(player_guess) != 4:
+
+            if self.check_special_code_present(player_guess) == True:
+                return player_guess
+            elif self.check_guess_length_improper(player_guess) == True:
                 print(" Player guess is improper length")
                 continue
+            elif self.check_guess_elements_valid(player_guess) == False:
+                print(" Guess is not valid")
+                continue
+            elif self.check_duplicates_exist(player_guess) == True:
+                print(" Guess should not include duplicate values.")
+                continue
+            else:
+                return player_guess
             
-            for guess_part in player_guess:
-                # NOTE: I have no idea what the issue is here. Actually, its probobly an index issue. Regardless, for what ever reason, 0 is accessing the color the 6 should be accessing. Whatever. It works like this. 
-                # TODO: Fix this absolute baboon.
-                if guess_part == '6':
-                    guess_part = '0'
-                elif guess_part == '0':
-                    guess_part = '6'
-                
-                if guess_part not in [str(self.guess_options.index(option)) for option in self.guess_options]:
-                    print(" This guess is not valid")
-                    break
-                else:
-                    return player_guess
-                
+    def check_duplicates_exist(self, guess):
+        for num in guess:
+            if guess.count(num) > 1:
+                return True
+    
+        return False        
+    
+    def check_guess_elements_valid(self, guess):
+        valid_guess_elements = [str(self.guess_options.index(option)+1) for option in self.guess_options]
+        
+        for guess_part in guess:
+            if guess_part not in valid_guess_elements:
+                return False
+        
+        return True
+    
+    def check_special_code_present(self, guess):
+        if guess == 'X':
+            print(" Returning to menu")
+            sleep(1)
+            return True
+        else:
+            return False
+    
+    def check_guess_length_improper(self, guess):
+        if len(guess) != 4:
+            return True
+        else:
+            return False
 
-# NOTE: For the time being, the code must consist of four unique colors. Might change this later idk. Maybe this could be a difficulty setting?
+# NOTE: For the time being, the code must consist of four UNIQUE colors. Might change this later idk. Maybe this could be a difficulty setting?
 class code():
     def __init__(self):
         self.code = self.generate_code()
@@ -292,12 +312,12 @@ class game_board():
         self.guess_rows = ["● ● ● ● " for _ in range(10)]
         self.hint_rows = ["○ ○ ○ ○" for _ in range(len(self.guess_rows))]
         self.guess_options = [
-            style_text("●", "f91b40"),
-            style_text("●", "f92b40"),
-            style_text("●", "f93b40"),
-            style_text("●", "f94b40"),
-            style_text("●", "f95b40"),
-            style_text("●", "f96b40")]
+            style_text("●", "f91b40"), #Red
+            style_text("●", "f92b40"), #Green
+            style_text("●", "f93b40"), #Yellow
+            style_text("●", "f94b40"), #Blue
+            style_text("●", "f95b40"), #Purple
+            style_text("●", "f96b40")] #Cyan
         self.turn_number = 0
         self.score = 0
         self.code_matching = False
@@ -332,6 +352,8 @@ class game_board():
     
     def display_game_board(self):
         system("cls")
+        print(self.code)
+        
         print()
         if self.active_player != None:
             print(f" Active Player : {self.active_player['player_name']}")
@@ -373,26 +395,21 @@ class game_board():
         
         hint = ''
         
-        
-        
         code = self.code.split(" ")[0:4]
         guess = player_guess_color.split(" ")[0:4]
         
-        # TODO: Finish working on this mess. Its wrong. Play with it.
         for peg in guess:
             peg_index = guess.index(peg)
-            if (peg in code) and (peg == code[peg_index]):
+            
+            if ((peg in code) and (peg == code[peg_index])):
                 hint += (style_text("●", "f91b40") + " ")
-            elif (peg in code) and (peg != code[peg_index]):
+            elif ((peg in code) and (peg != code[peg_index])):
                 hint += (style_text("●", "f97b40") + " ")
             elif (peg not in code):
                 hint += "○ "
         
-        
         self.hint_rows[self.turn_number-1] = hint   
         self.guess_rows[self.turn_number-1] = player_guess_color
-        print(self.code)
-        input()
     
     def modify_score(self):
         pass
