@@ -1,5 +1,3 @@
-# TODO: Make this bitch accept the words as colors. Numbers are hard fool.
-
 def style_text(msg:str, codes:str)->str:
     """Summary --> Accepts message and style codes as strings. Parses style codes to apply indicated ANSI text style options. Returns message with added ANSI codes.
         Arguments --> msg (str) : Message to be modified with ANSI style codes.

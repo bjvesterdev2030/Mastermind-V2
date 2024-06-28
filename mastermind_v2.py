@@ -6,10 +6,8 @@ from pycolor import style_text
 from time import sleep
 from os import system
 
-
-# Special Characters : ╚ ╗ ╔ ╝║ ═ ╣ ╠ ╩ ╦ ●
-
 # BUG: Cannot escape the set_active_player() or delete_profile() functions if there are no profiles. Fix this.
+# BUG: Turn number increments on win screen. (Win on turn 3 shows turn 4 on the win screen)
 class player_profile():
     def __init__(self):
         pass
@@ -92,7 +90,6 @@ class game_menu():
                 score = game.play()
                 
                 if score != None:
-                    # TODO: Need to figure out how the score is gonna change.
                     pass
                 
                 self.return_to_menu()
@@ -287,13 +284,11 @@ class guess():
         else:
             return False
 
-# NOTE: For the time being, the code must consist of four UNIQUE colors. Might change this later idk. Maybe this could be a difficulty setting?
 class code():
     def __init__(self):
         self.code = self.generate_code()
     
     def generate_code(self):
-        # TODO: Gonna make this stuff words... yeah.
         available_colors = ["91","92","93","94","95","96"]
         code_pattern = ''
         
@@ -308,7 +303,7 @@ class code():
 class game_board():
     def __init__(self, active_player:dict):
         self.active_player = active_player
-        self.code = code().generate_code()
+        self.code = code().code
         self.guess_rows = ["● ● ● ● " for _ in range(10)]
         self.hint_rows = ["○ ○ ○ ○" for _ in range(len(self.guess_rows))]
         self.guess_options = [
@@ -329,7 +324,7 @@ class game_board():
     def play(self):
         self.display_game_board()
         
-        while (self.code_matching == False) and (self.turn_number < len(self.guess_rows)):
+        while ((self.code_matching == False) and (self.turn_number < len(self.guess_rows))):
             self.increment_turn_number()
             player_guess = self.get_player_guess()
             
@@ -337,18 +332,17 @@ class game_board():
                 return
             else:
                 self.evaluate_guess(player_guess)
-                self.modify_score()
                 self.display_game_board()
-            
-                
+        
+        self.calculate_score()
         self.game_over_handler()
         
     # --- Game Operation Functions --- #
     def game_over_handler(self):
         if self.code_matching == False:
-            print(f" Game Over. You Lost.\n Total Turns : {self.turn_number}")
+            print(f" Game Over -- You Lost.\n Total Turns : {self.turn_number}\n Score : {self.score}")
         elif self.code_matching == True:
-            print(f" Game Over. You Won.\n Total Turns : {self.turn_number}")
+            print(f" Game Over -- You Won!\n Total Turns : {self.turn_number}\n Score : {self.score}")
     
     def display_game_board(self):
         system("cls")
@@ -360,7 +354,6 @@ class game_board():
         else:
             print(" Active Player : Guest")
             
-        print(f" Score : {self.score}")
         if self.turn_number < 10:
             print(f" Turn Number : {self.turn_number+1}")
         else:
@@ -410,20 +403,26 @@ class game_board():
         
         self.hint_rows[self.turn_number-1] = hint   
         self.guess_rows[self.turn_number-1] = player_guess_color
+        
+        if self.code == player_guess_color:
+            self.code_matching = True
     
-    def modify_score(self):
-        pass
+    def calculate_score(self):
+        score = 0
+        
+        for row in self.guess_rows:
+            if row == "● ● ● ● ":
+                score += 10
+                
+        self.score = score
     
     def increment_turn_number(self):
         self.turn_number += 1
     
         
 def main():
-    # menu = game_menu()
-    # menu.display_menu_screen()
-    
-    game = game_board(None)
-    game.play()
+    menu = game_menu()
+    menu.display_menu_screen()
 
 if __name__ == "__main__":
     main()
