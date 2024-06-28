@@ -93,7 +93,7 @@ class game_menu():
                 score = game.play()
                 
                 if self.active_profile == None:
-                    print("no active profile")
+                    print(" No active profile")
                 else:
                     self.active_profile["player_highscore"] = score
                     self.update_player_profile_file()
@@ -287,8 +287,6 @@ class guess():
     
     def check_special_code_present(self, guess):
         if guess == 'X':
-            print(" Returning to menu")
-            sleep(1)
             return True
         else:
             return False
@@ -361,7 +359,6 @@ class game_board():
     
     def display_game_board(self):
         system("cls")
-        print(self.code)
         
         print()
         if self.active_player != None:
