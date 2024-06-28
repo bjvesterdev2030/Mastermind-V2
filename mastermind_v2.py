@@ -6,8 +6,6 @@ from pycolor import style_text
 from time import sleep
 from os import system
 
-# BUG: Cannot escape the set_active_player() or delete_profile() functions if there are no profiles. Fix this.
-# BUG: Turn number increments on win screen. (Win on turn 3 shows turn 4 on the win screen)
 class player_profile():
     def __init__(self):
         pass
@@ -18,7 +16,7 @@ class game_menu():
         self.active_profile = None
         self.player_profiles = self.recall_profiles()
 
-    # --- Methods for data recall --- #
+    # --- Methods for data recall and modification --- #
     
     def recall_profiles(self):
         with open("player_profiles.json", "rt") as profiles_file:
@@ -29,6 +27,11 @@ class game_menu():
         with open("logo.txt", 'rt') as file:
             logo = file.read()
             return logo
+        
+    def update_player_profile_file(self):
+        with open("player_profiles.json", 'wt') as profiles_file:
+            json.dump(self.player_profiles, profiles_file)
+        profiles_file.close()    
         
     # --- Menu operation functions --- #
         
@@ -89,8 +92,11 @@ class game_menu():
                 game = game_board(active_player=self.active_profile)
                 score = game.play()
                 
-                if score != None:
-                    pass
+                if self.active_profile == None:
+                    print("no active profile")
+                else:
+                    self.active_profile["player_highscore"] = score
+                    self.update_player_profile_file()
                 
                 self.return_to_menu()
             case "H":
@@ -121,34 +127,40 @@ class game_menu():
         system("cls")
         print("\n <--> <--> Select Profile <--> <--> \n")
         
-        for i, profile in enumerate(self.player_profiles):
-            (print(f" [{i+1}] {profile['player_name']}"))
-        print()
-        
-        valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
-        
-        profile_selection = 0
-        while (profile_selection not in valid_input):
-            profile_selection = str(input(" Selection : "))
-            if profile_selection not in valid_input:
-                print(" This input is invalid. Please enter a valid input.")
-        
-        profile_selection = int(profile_selection)-1
-        self.active_profile = self.player_profiles[profile_selection]
-        
-        print(f"\n Active Profile set to... {self.active_profile['player_name']}")
-        
+        if len(self.player_profiles) == 0:
+            print(" No player profiles")
+        else:
+            for i, profile in enumerate(self.player_profiles):
+                (print(f" [{i+1}] {profile['player_name']}"))
+            print()
+
+            valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
+
+            profile_selection = 0
+            while (profile_selection not in valid_input):
+                profile_selection = str(input(" Selection : "))
+                if profile_selection not in valid_input:
+                    print(" This input is invalid. Please enter a valid input.")
+
+            profile_selection = int(profile_selection)-1
+            self.active_profile = self.player_profiles[profile_selection]
+
+            print(f"\n Active Profile set to... {self.active_profile['player_name']}")
+
         self.return_to_menu()
-        
+
     def show_high_scores(self):
         system("cls")
         print("\n <--> <--> Highscores <--> <--> \n")
         
-        profile_by_high_score = sorted(self.player_profiles, key=lambda profile: profile["player_highscore"])
-        profile_by_high_score = reversed(profile_by_high_score[-5::])
-        
-        for i, profile in enumerate(profile_by_high_score):
-            print(f" {i+1}. {profile['player_name']} -- {profile['player_highscore']}")
+        if len(self.player_profiles) == 0:
+            print(" No player profiles")
+        else:
+            profile_by_high_score = sorted(self.player_profiles, key=lambda profile: profile["player_highscore"])
+            profile_by_high_score = reversed(profile_by_high_score[-5::])
+
+            for i, profile in enumerate(profile_by_high_score):
+                print(f" {i+1}. {profile['player_name']} -- {profile['player_highscore']}")
             
         self.return_to_menu()
     
@@ -197,34 +209,37 @@ class game_menu():
     def delete_profile(self):
         system("cls")
         print("\n <--> <--> Delete Profile <--> <--> \n")
-        
-        for i, profile in enumerate(self.player_profiles):
-            (print(f" [{i+1}] {profile['player_name']}"))
-        print()
-        
-        valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
-        
-        profile_selection = 0
-        while (profile_selection not in valid_input):
-            profile_selection = str(input(" Selection : "))
-            if profile_selection not in valid_input:
-                print(" This input is invalid. Please enter a valid input.")
-                
-        profile_selection = int(profile_selection)-1
-        
-        print(f"\n Deleting profile... {self.player_profiles[profile_selection]['player_name']}")
-        
-        if (self.active_profile != None) and (self.active_profile["player_id"] == self.player_profiles[profile_selection]["player_id"]):
-            self.active_profile = None
-        
-        self.player_profiles.pop(profile_selection)
-        
-        profile_file_update = json.dumps(self.player_profiles, indent=4)
-        
-        with open("player_profiles.json", "wt") as profiles_file:
-            profiles_file.write(profile_file_update)
-        profiles_file.close()
-        
+       
+        if len(self.player_profiles) == 0:
+            print(" No player profiles")
+        else:
+            for i, profile in enumerate(self.player_profiles):
+                (print(f" [{i+1}] {profile['player_name']}"))
+            print()
+
+            valid_input = [str(num) for num in range(1, len(self.player_profiles)+1)]
+
+            profile_selection = 0
+            while (profile_selection not in valid_input):
+                profile_selection = str(input(" Selection : "))
+                if profile_selection not in valid_input:
+                    print(" This input is invalid. Please enter a valid input.")
+
+            profile_selection = int(profile_selection)-1
+
+            print(f"\n Deleting profile... {self.player_profiles[profile_selection]['player_name']}")
+
+            if (self.active_profile != None) and (self.active_profile["player_id"] == self.player_profiles[profile_selection]   ["player_id"]):
+                self.active_profile = None
+
+            self.player_profiles.pop(profile_selection)
+
+            profile_file_update = json.dumps(self.player_profiles, indent=4)
+
+            with open("player_profiles.json", "wt") as profiles_file:
+                profiles_file.write(profile_file_update)
+            profiles_file.close()
+
         self.return_to_menu()
         
 class guess():
@@ -317,8 +332,6 @@ class game_board():
         self.score = 0
         self.code_matching = False
     
-    # NOTE: Concernig the use of 'self.turn_number' and 'self.increment_turn_number()' in the methods 'self.play(),' 'self.display_game_board(),' and 'self.evaluate_guess,' I have no idea how anything is currently set up. Some how I had to add 1 to the turn number to display the number, but also subtract 1 from the turn order to update the board values. In short, it is spaghettied. Tbh i dont really care. It works.
-    
     # --- The Play Function --- #
     
     def play(self):
@@ -336,6 +349,8 @@ class game_board():
         
         self.calculate_score()
         self.game_over_handler()
+        
+        return self.score
         
     # --- Game Operation Functions --- #
     def game_over_handler(self):
